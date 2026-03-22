@@ -67,4 +67,49 @@ public class WsDtoDeserializationTest {
         assertEquals(WsOrderStatus.FILLED, update.getStatus());
         assertEquals(42L, update.getOrder().getOid());
     }
+
+    @Test
+    void userFillsMessageDeserializes() throws Exception {
+        String json = """
+            {"isSnapshot":true,"fills":[
+              {"coin":"ETH","px":"2000","sz":"0.1","side":"A","time":1700000000,
+               "startPosition":"0","dir":"Open Long","closedPnl":"0","hash":"0xabc",
+               "oid":1,"crossed":false,"fee":"0.1","tid":1,"feeToken":"USDC"}
+            ]}
+            """;
+        io.github.hyperliquid.sdk.model.websocket.UserFillsMessage msg =
+            JSONUtil.readValue(json, io.github.hyperliquid.sdk.model.websocket.UserFillsMessage.class);
+        assertTrue(msg.isSnapshot());
+        assertEquals(1, msg.getFills().size());
+        assertEquals("ETH", msg.getFills().get(0).getCoin());
+    }
+
+    @Test
+    void userEventsMessageFillsVariant() throws Exception {
+        String json = """
+            {"fills":[
+              {"coin":"ETH","px":"2000","sz":"0.1","side":"A","time":1700000000,
+               "startPosition":"0","dir":"Open Long","closedPnl":"0","hash":"0xabc",
+               "oid":1,"crossed":false,"fee":"0.1","tid":1,"feeToken":"USDC"}
+            ]}
+            """;
+        io.github.hyperliquid.sdk.model.websocket.UserEventsMessage msg =
+            JSONUtil.readValue(json, io.github.hyperliquid.sdk.model.websocket.UserEventsMessage.class);
+        assertNotNull(msg.getFills());
+        assertNull(msg.getFunding());
+        assertNull(msg.getLiquidation());
+        assertEquals(1, msg.getFills().size());
+    }
+
+    @Test
+    void userEventsMessageLiquidationVariant() throws Exception {
+        String json = """
+            {"liquidation":{"user":"0xabc","leveragedPosition":1,"liquidatedNtlPos":"500","accountValue":"0"}}
+            """;
+        io.github.hyperliquid.sdk.model.websocket.UserEventsMessage msg =
+            JSONUtil.readValue(json, io.github.hyperliquid.sdk.model.websocket.UserEventsMessage.class);
+        assertNull(msg.getFills());
+        assertNotNull(msg.getLiquidation());
+        assertEquals("0xabc", msg.getLiquidation().getUser());
+    }
 }
