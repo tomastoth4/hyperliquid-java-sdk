@@ -33,4 +33,9 @@ public class UserEventsSubscription extends Subscription {
     public String getType() {
         return type;
     }
+
+    @Override
+    public String toIdentifier() {
+        return type; // type == "userEvents"
+    }
 }
