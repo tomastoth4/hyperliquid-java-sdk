@@ -116,6 +116,62 @@ public class Exchange {
     }
 
     /**
+     * Place a TWAP order.
+     *
+     * @param coin       Asset symbol (e.g. "ETH")
+     * @param isBuy      true for buy, false for sell
+     * @param sz         Size as string (e.g. "0.01")
+     * @param minutes    Duration of TWAP execution in minutes
+     * @param reduceOnly Whether this order may only reduce position
+     * @return TwapOrderResult with twapId
+     */
+    public TwapOrderResult placeTwapOrder(String coin, boolean isBuy, String sz,
+                                          int minutes, boolean reduceOnly) {
+        int asset = ensureAssetId(coin);
+        Map<String, Object> action = new LinkedHashMap<>();
+        action.put("type", "twapOrder");
+        Map<String, Object> twap = new LinkedHashMap<>();
+        twap.put("a", asset);
+        twap.put("b", isBuy);
+        twap.put("s", sz);
+        twap.put("r", reduceOnly);
+        twap.put("m", minutes);
+        twap.put("t", false);  // randomReduce, default false
+        action.put("twap", twap);
+        JsonNode response = postAction(action);
+        JsonNode running = response.path("response").path("data").path("running");
+        return JSONUtil.convertValue(running, TwapOrderResult.class);
+    }
+
+    /**
+     * Cancel a running TWAP order.
+     *
+     * @param coin   Asset symbol
+     * @param twapId TWAP ID returned from placeTwapOrder
+     * @return TwapCancelResult
+     */
+    public TwapCancelResult cancelTwapOrder(String coin, long twapId) {
+        int asset = ensureAssetId(coin);
+        Map<String, Object> action = new LinkedHashMap<>();
+        action.put("type", "twapCancel");
+        Map<String, Object> cancel = new LinkedHashMap<>();
+        cancel.put("a", asset);
+        cancel.put("t", twapId);
+        action.put("twap", cancel);
+        JsonNode response = postAction(action);
+        JsonNode cancelled = response.path("response").path("data").path("cancelled");
+        if (cancelled.isMissingNode()) {
+            TwapCancelResult result = new TwapCancelResult();
+            result.setTwapId(twapId);
+            result.setStatus(response.path("status").asText());
+            return result;
+        }
+        TwapCancelResult result = JSONUtil.convertValue(cancelled, TwapCancelResult.class);
+        if (result.getTwapId() == null) result.setTwapId(twapId);
+        return result;
+    }
+
+    /**
      * Change leverage
      *
      * @param coinName Coin name
