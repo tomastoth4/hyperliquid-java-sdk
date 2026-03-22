@@ -139,7 +139,7 @@ public class Exchange {
         twap.put("t", false);  // randomReduce, default false
         action.put("twap", twap);
         JsonNode response = postAction(action);
-        JsonNode running = response.path("response").path("data").path("running");
+        JsonNode running = response.path("response").path("data").path("status").path("running");
         return JSONUtil.convertValue(running, TwapOrderResult.class);
     }
 
@@ -154,20 +154,13 @@ public class Exchange {
         int asset = ensureAssetId(coin);
         Map<String, Object> action = new LinkedHashMap<>();
         action.put("type", "twapCancel");
-        Map<String, Object> cancel = new LinkedHashMap<>();
-        cancel.put("a", asset);
-        cancel.put("t", twapId);
-        action.put("twap", cancel);
+        action.put("a", asset);
+        action.put("t", (int) twapId);
         JsonNode response = postAction(action);
-        JsonNode cancelled = response.path("response").path("data").path("cancelled");
-        if (cancelled.isMissingNode()) {
-            TwapCancelResult result = new TwapCancelResult();
-            result.setTwapId(twapId);
-            result.setStatus(response.path("status").asText());
-            return result;
-        }
-        TwapCancelResult result = JSONUtil.convertValue(cancelled, TwapCancelResult.class);
-        if (result.getTwapId() == null) result.setTwapId(twapId);
+        // Response: {"status":"ok","response":{"type":"twapCancel","data":{"status":"success"}}}
+        TwapCancelResult result = new TwapCancelResult();
+        result.setTwapId(twapId);
+        result.setStatus(response.path("response").path("data").path("status").asText());
         return result;
     }
 

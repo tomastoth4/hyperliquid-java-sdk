@@ -9,9 +9,9 @@ public class TwapOrderIntegrationTest extends IntegrationTestBase {
 
     @Test
     void placeThenCancelTwapOrder() {
-        // Place a small TWAP buy of 0.001 ETH over 5 minutes on testnet
+        // Place a small TWAP buy of 0.05 ETH over 5 minutes on testnet (~$80, above $50 min)
         TwapOrderResult result = client.getExchange()
-            .placeTwapOrder("ETH", true, "0.001", 5, false);
+            .placeTwapOrder("ETH", true, "0.05", 5, false);
 
         assertNotNull(result, "placeTwapOrder should return a result");
         assertNotNull(result.getTwapId(), "twapId must be present");
