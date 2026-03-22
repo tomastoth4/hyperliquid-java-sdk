@@ -39,11 +39,11 @@ public class ExampleWebsocketBTC {
         // ====================
         // Subscribe to BTC individual trades====================
         TradesSubscription btcTrades = TradesSubscription.of("BTC");
-        info.subscribe(btcTrades, msg -> System.out.println("BTC 成交: " + msg));
+        info.subscribe(btcTrades, (WebsocketManager.MessageCallback) msg -> System.out.println("BTC 成交: " + msg));
 
         // Subscribe to ETH individual trades
         TradesSubscription ethTrades = TradesSubscription.of("ETH");
-        info.subscribe(ethTrades, msg -> System.out.println("ETH 成交: " + msg));
+        info.subscribe(ethTrades, (WebsocketManager.MessageCallback) msg -> System.out.println("ETH 成交: " + msg));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class ExampleWebsocketBTC {
                 // .addPrivateKey(TESTNET_PRIVATE_KEY)
                 .build();
         OrderUpdatesSubscription orderUpdatesSubscription = OrderUpdatesSubscription.of("0x....");
-        client.getInfo().subscribe(orderUpdatesSubscription, System.out::println);
+        client.getInfo().subscribe(orderUpdatesSubscription, (WebsocketManager.MessageCallback) System.out::println);
 
         /*
          * Retrieve all active subscriptions

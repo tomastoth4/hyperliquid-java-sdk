@@ -8,7 +8,8 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.hyperliquid.sdk.config.CacheConfig;
 import io.github.hyperliquid.sdk.model.info.*;
 import io.github.hyperliquid.sdk.model.order.Cloid;
-import io.github.hyperliquid.sdk.model.subscription.Subscription;
+import io.github.hyperliquid.sdk.model.subscription.*;
+import io.github.hyperliquid.sdk.model.websocket.*;
 import io.github.hyperliquid.sdk.utils.HypeError;
 import io.github.hyperliquid.sdk.utils.HypeHttpClient;
 import io.github.hyperliquid.sdk.utils.JSONUtil;
@@ -1434,6 +1435,80 @@ public class Info {
         if (skipWs)
             throw new HypeError("WebSocket disabled by skipWs");
         wsManager.subscribe(subscription, callback);
+    }
+
+    /**
+     * Typed subscribe overload for UserFillsSubscription.
+     */
+    public void subscribe(UserFillsSubscription sub, java.util.function.Consumer<UserFillsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserFillsMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for UserFundingsSubscription.
+     */
+    public void subscribe(UserFundingsSubscription sub, java.util.function.Consumer<UserFundingsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserFundingsMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for UserNonFundingLedgerUpdatesSubscription.
+     */
+    public void subscribe(UserNonFundingLedgerUpdatesSubscription sub, java.util.function.Consumer<UserNonFundingLedgerMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserNonFundingLedgerMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for ActiveAssetCtxSubscription.
+     */
+    public void subscribe(ActiveAssetCtxSubscription sub, java.util.function.Consumer<ActiveAssetCtxMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), ActiveAssetCtxMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for ActiveAssetDataSubscription.
+     */
+    public void subscribe(ActiveAssetDataSubscription sub, java.util.function.Consumer<ActiveAssetDataMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), ActiveAssetDataMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for OrderUpdatesSubscription.
+     */
+    public void subscribe(OrderUpdatesSubscription sub, java.util.function.Consumer<OrderUpdateMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> {
+            java.util.List<WsOrderUpdate> list = JSONUtil.toList(msg.get("data"), WsOrderUpdate.class);
+            OrderUpdateMessage m = new OrderUpdateMessage();
+            m.setOrders(list);
+            callback.accept(m);
+        });
+    }
+
+    /**
+     * Typed subscribe overload for TradesSubscription.
+     */
+    public void subscribe(TradesSubscription sub, java.util.function.Consumer<TradeMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> {
+            java.util.List<WsTrade> list = JSONUtil.toList(msg.get("data"), WsTrade.class);
+            TradeMessage m = new TradeMessage();
+            m.setTrades(list);
+            callback.accept(m);
+        });
+    }
+
+    /**
+     * Typed subscribe overload for UserEventsSubscription.
+     */
+    public void subscribe(UserEventsSubscription sub, java.util.function.Consumer<UserEventsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserEventsMessage.class)));
     }
 
     /**
