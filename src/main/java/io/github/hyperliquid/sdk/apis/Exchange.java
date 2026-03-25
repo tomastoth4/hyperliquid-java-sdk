@@ -155,7 +155,7 @@ public class Exchange {
         Map<String, Object> action = new LinkedHashMap<>();
         action.put("type", "twapCancel");
         action.put("a", asset);
-        action.put("t", (int) twapId);
+        action.put("t", twapId);
         JsonNode response = postAction(action);
         // Response: {"status":"ok","response":{"type":"twapCancel","data":{"status":"success"}}}
         TwapCancelResult result = new TwapCancelResult();
@@ -1283,24 +1283,10 @@ public class Exchange {
      * @throws HypeError If signing or the request fails
      */
     public JsonNode setReferrer(String code) {
-        long nonce = Signing.getTimestampMs();
         Map<String, Object> action = new LinkedHashMap<>();
         action.put("type", "setReferrer");
         action.put("code", code);
-        action.put("nonce", nonce);
-
-        List<Map<String, Object>> payloadTypes = List.of(
-                Map.of("name", "hyperliquidChain", "type", "string"),
-                Map.of("name", "code", "type", "string"),
-                Map.of("name", "nonce", "type", "uint64"));
-
-        Map<String, Object> signature = Signing.signUserSignedAction(
-                apiWallet.getCredentials(),
-                action,
-                payloadTypes,
-                "HyperliquidTransaction:SetReferrer",
-                isMainnet());
-        return postActionWithSignature(action, signature, nonce);
+        return postAction(action);
     }
 
     /**
@@ -1635,9 +1621,8 @@ public class Exchange {
         action.put("type", "approveAgent");
         action.put("agentAddress", agentAddress);
         action.put("nonce", nonce);
-        if (name != null) {
-            action.put("agentName", name);
-        }
+        boolean agentNameIsNull = (name == null);
+        action.put("agentName", name != null ? name : "");
 
         // ApproveAgent payload types
         List<Map<String, Object>> payloadTypes = List.of(
@@ -1652,6 +1637,9 @@ public class Exchange {
                 payloadTypes,
                 "HyperliquidTransaction:ApproveAgent",
                 isMainnet());
+        if (agentNameIsNull) {
+            action.remove("agentName");
+        }
 
         JsonNode resp = postActionWithSignature(action, signature, nonce);
         return new ApproveAgentResult(resp, agentPrivateKey, agentAddress);
@@ -1783,8 +1771,11 @@ public class Exchange {
      * @return The effective vault address to be used in the request, or null
      */
     private String calculateEffectiveVaultAddress(String actionType) {
-        // usdClassTransfer and sendAsset do not use vaultAddress
-        if ("usdClassTransfer".equals(actionType) || "sendAsset".equals(actionType)) {
+        // usdClassTransfer, sendAsset and the following types do not use vaultAddress
+        if ("usdClassTransfer".equals(actionType) || "sendAsset".equals(actionType)
+                || "setReferrer".equals(actionType) || "createSubAccount".equals(actionType)
+                || "subAccountTransfer".equals(actionType) || "subAccountSpotTransfer".equals(actionType)
+                || "vaultTransfer".equals(actionType)) {
             return null;
         }
         if (vaultAddress == null) {

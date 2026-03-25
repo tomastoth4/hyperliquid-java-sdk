@@ -1,6 +1,7 @@
 package io.github.hyperliquid.sdk.model.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /** Frontend open order entity wrapper (carrying trigger/take-profit/stop-loss and other additional information) */
 public class FrontendOpenOrder {
@@ -30,6 +31,10 @@ public class FrontendOpenOrder {
     private String triggerCondition;
     /** Trigger price (string) */
     private String triggerPx;
+    /** Time-in-force (nullable) */
+    private String tif;
+    /** Sub-orders (nullable) */
+    private List<FrontendOpenOrder> children;
 
     // Getter and Setter methods
     public String getCoin() {
@@ -136,5 +141,21 @@ public class FrontendOpenOrder {
 
     public void setTriggerPx(String triggerPx) {
         this.triggerPx = triggerPx;
+    }
+
+    public String getTif() {
+        return tif;
+    }
+
+    public void setTif(String tif) {
+        this.tif = tif;
+    }
+
+    public List<FrontendOpenOrder> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<FrontendOpenOrder> children) {
+        this.children = children;
     }
 }

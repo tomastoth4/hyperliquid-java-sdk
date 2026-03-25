@@ -185,9 +185,7 @@ public class Info {
     public Map<String, String> allMids(String dex) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "allMids");
-        if (dex != null) {
-            payload.put("dex", dex);
-        }
+        payload.put("dex", dex != null ? dex : "");
         JsonNode node = postInfo(payload);
         return JSONUtil.convertValue(node,
                 TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
@@ -1012,6 +1010,7 @@ public class Info {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userFunding");
         payload.put("user", address);
+        payload.put("coin", coin);
         payload.put("startTime", startMs);
         payload.put("endTime", endMs);
         return postInfo(payload);
@@ -1038,16 +1037,12 @@ public class Info {
      * Historical order query.
      *
      * @param address User address
-     * @param startMs Start milliseconds
-     * @param endMs   End milliseconds
      * @return JSON response
      */
-    public JsonNode historicalOrders(String address, long startMs, long endMs) {
+    public JsonNode historicalOrders(String address) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "historicalOrders");
         payload.put("user", address);
-        payload.put("startTime", startMs);
-        payload.put("endTime", endMs);
         return postInfo(payload);
     }
 
@@ -1055,16 +1050,12 @@ public class Info {
      * User TWAP slice fill query.
      *
      * @param address User address
-     * @param startMs Start milliseconds
-     * @param endMs   End milliseconds
      * @return JSON response
      */
-    public JsonNode userTwapSliceFills(String address, long startMs, long endMs) {
+    public JsonNode userTwapSliceFills(String address) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userTwapSliceFills");
         payload.put("user", address);
-        payload.put("startTime", startMs);
-        payload.put("endTime", endMs);
         return postInfo(payload);
     }
 
@@ -1157,9 +1148,7 @@ public class Info {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "clearinghouseState");
         payload.put("user", address);
-        if (dex != null && !dex.isEmpty()) {
-            payload.put("dex", dex);
-        }
+        payload.put("dex", dex != null ? dex : "");
         return JSONUtil.convertValue(postInfo(payload), ClearinghouseState.class);
     }
 
@@ -1341,20 +1330,11 @@ public class Info {
     /**
      * Spot deploy auction status.
      *
+     * @param user User address
      * @return JSON response
      */
-    public JsonNode querySpotDeployAuctionStatus() {
-        // This interface corresponds to spotDeployState(user) in the Python SDK; the
-        // Java SDK already provides it
-        // spotDeployState(address)
-        // Keep this method to avoid breaking existing calls, but the server does not
-        // support spotDeploy queries without a user; return an empty object to avoid
-        // 4xx
-        try {
-            return JSONUtil.readTree("{}");
-        } catch (Exception e) {
-            throw new HypeError("Failed to parse empty JSON", e);
-        }
+    public JsonNode querySpotDeployAuctionStatus(String user) {
+        return spotDeployState(user);
     }
 
     /**
@@ -1389,6 +1369,19 @@ public class Info {
      */
     public JsonNode queryUserDexAbstractionState(String address) {
         Map<String, Object> payload = Map.of("type", "userDexAbstraction", "user", address);
+        return postInfo(payload);
+    }
+
+    /**
+     * Query user abstraction state.
+     *
+     * @param user User address
+     * @return JSON response
+     */
+    public JsonNode queryUserAbstractionState(String user) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("type", "userAbstraction");
+        payload.put("user", user);
         return postInfo(payload);
     }
 
