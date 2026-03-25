@@ -116,6 +116,55 @@ public class Exchange {
     }
 
     /**
+     * Place a TWAP order.
+     *
+     * @param coin       Asset symbol (e.g. "ETH")
+     * @param isBuy      true for buy, false for sell
+     * @param sz         Size as string (e.g. "0.01")
+     * @param minutes    Duration of TWAP execution in minutes
+     * @param reduceOnly Whether this order may only reduce position
+     * @return TwapOrderResult with twapId
+     */
+    public TwapOrderResult placeTwapOrder(String coin, boolean isBuy, String sz,
+                                          int minutes, boolean reduceOnly) {
+        int asset = ensureAssetId(coin);
+        Map<String, Object> action = new LinkedHashMap<>();
+        action.put("type", "twapOrder");
+        Map<String, Object> twap = new LinkedHashMap<>();
+        twap.put("a", asset);
+        twap.put("b", isBuy);
+        twap.put("s", sz);
+        twap.put("r", reduceOnly);
+        twap.put("m", minutes);
+        twap.put("t", false);  // randomReduce, default false
+        action.put("twap", twap);
+        JsonNode response = postAction(action);
+        JsonNode running = response.path("response").path("data").path("status").path("running");
+        return JSONUtil.convertValue(running, TwapOrderResult.class);
+    }
+
+    /**
+     * Cancel a running TWAP order.
+     *
+     * @param coin   Asset symbol
+     * @param twapId TWAP ID returned from placeTwapOrder
+     * @return TwapCancelResult
+     */
+    public TwapCancelResult cancelTwapOrder(String coin, long twapId) {
+        int asset = ensureAssetId(coin);
+        Map<String, Object> action = new LinkedHashMap<>();
+        action.put("type", "twapCancel");
+        action.put("a", asset);
+        action.put("t", twapId);
+        JsonNode response = postAction(action);
+        // Response: {"status":"ok","response":{"type":"twapCancel","data":{"status":"success"}}}
+        TwapCancelResult result = new TwapCancelResult();
+        result.setTwapId(twapId);
+        result.setStatus(response.path("response").path("data").path("status").asText());
+        return result;
+    }
+
+    /**
      * Change leverage
      *
      * @param coinName Coin name
@@ -1234,24 +1283,10 @@ public class Exchange {
      * @throws HypeError If signing or the request fails
      */
     public JsonNode setReferrer(String code) {
-        long nonce = Signing.getTimestampMs();
         Map<String, Object> action = new LinkedHashMap<>();
         action.put("type", "setReferrer");
         action.put("code", code);
-        action.put("nonce", nonce);
-
-        List<Map<String, Object>> payloadTypes = List.of(
-                Map.of("name", "hyperliquidChain", "type", "string"),
-                Map.of("name", "code", "type", "string"),
-                Map.of("name", "nonce", "type", "uint64"));
-
-        Map<String, Object> signature = Signing.signUserSignedAction(
-                apiWallet.getCredentials(),
-                action,
-                payloadTypes,
-                "HyperliquidTransaction:SetReferrer",
-                isMainnet());
-        return postActionWithSignature(action, signature, nonce);
+        return postAction(action);
     }
 
     /**
@@ -1586,9 +1621,8 @@ public class Exchange {
         action.put("type", "approveAgent");
         action.put("agentAddress", agentAddress);
         action.put("nonce", nonce);
-        if (name != null) {
-            action.put("agentName", name);
-        }
+        boolean agentNameIsNull = (name == null);
+        action.put("agentName", name != null ? name : "");
 
         // ApproveAgent payload types
         List<Map<String, Object>> payloadTypes = List.of(
@@ -1603,6 +1637,9 @@ public class Exchange {
                 payloadTypes,
                 "HyperliquidTransaction:ApproveAgent",
                 isMainnet());
+        if (agentNameIsNull) {
+            action.remove("agentName");
+        }
 
         JsonNode resp = postActionWithSignature(action, signature, nonce);
         return new ApproveAgentResult(resp, agentPrivateKey, agentAddress);
@@ -1734,8 +1771,11 @@ public class Exchange {
      * @return The effective vault address to be used in the request, or null
      */
     private String calculateEffectiveVaultAddress(String actionType) {
-        // usdClassTransfer and sendAsset do not use vaultAddress
-        if ("usdClassTransfer".equals(actionType) || "sendAsset".equals(actionType)) {
+        // usdClassTransfer, sendAsset and the following types do not use vaultAddress
+        if ("usdClassTransfer".equals(actionType) || "sendAsset".equals(actionType)
+                || "setReferrer".equals(actionType) || "createSubAccount".equals(actionType)
+                || "subAccountTransfer".equals(actionType) || "subAccountSpotTransfer".equals(actionType)
+                || "vaultTransfer".equals(actionType)) {
             return null;
         }
         if (vaultAddress == null) {

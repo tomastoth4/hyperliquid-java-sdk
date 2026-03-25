@@ -489,12 +489,12 @@ public class HyperliquidClientTest {
         long start = end - CandleInterval.HOUR_1.toMillis() * 24;
 
         resetLogs();
-        JsonNode h = info.historicalOrders(address, start, end);
+        JsonNode h = info.historicalOrders(address);
         assertNotNull(h);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode twap = info.userTwapSliceFills(address, start, end);
+        JsonNode twap = info.userTwapSliceFills(address);
         assertNotNull(twap);
         assertHttpLogsPresent();
     }

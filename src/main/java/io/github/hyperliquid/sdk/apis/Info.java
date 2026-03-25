@@ -8,7 +8,8 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.hyperliquid.sdk.config.CacheConfig;
 import io.github.hyperliquid.sdk.model.info.*;
 import io.github.hyperliquid.sdk.model.order.Cloid;
-import io.github.hyperliquid.sdk.model.subscription.Subscription;
+import io.github.hyperliquid.sdk.model.subscription.*;
+import io.github.hyperliquid.sdk.model.websocket.*;
 import io.github.hyperliquid.sdk.utils.HypeError;
 import io.github.hyperliquid.sdk.utils.HypeHttpClient;
 import io.github.hyperliquid.sdk.utils.JSONUtil;
@@ -184,9 +185,7 @@ public class Info {
     public Map<String, String> allMids(String dex) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "allMids");
-        if (dex != null) {
-            payload.put("dex", dex);
-        }
+        payload.put("dex", dex != null ? dex : "");
         JsonNode node = postInfo(payload);
         return JSONUtil.convertValue(node,
                 TypeFactory.defaultInstance().constructMapType(Map.class, String.class, String.class));
@@ -1011,6 +1010,7 @@ public class Info {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userFunding");
         payload.put("user", address);
+        payload.put("coin", coin);
         payload.put("startTime", startMs);
         payload.put("endTime", endMs);
         return postInfo(payload);
@@ -1037,16 +1037,12 @@ public class Info {
      * Historical order query.
      *
      * @param address User address
-     * @param startMs Start milliseconds
-     * @param endMs   End milliseconds
      * @return JSON response
      */
-    public JsonNode historicalOrders(String address, long startMs, long endMs) {
+    public JsonNode historicalOrders(String address) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "historicalOrders");
         payload.put("user", address);
-        payload.put("startTime", startMs);
-        payload.put("endTime", endMs);
         return postInfo(payload);
     }
 
@@ -1054,16 +1050,12 @@ public class Info {
      * User TWAP slice fill query.
      *
      * @param address User address
-     * @param startMs Start milliseconds
-     * @param endMs   End milliseconds
      * @return JSON response
      */
-    public JsonNode userTwapSliceFills(String address, long startMs, long endMs) {
+    public JsonNode userTwapSliceFills(String address) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userTwapSliceFills");
         payload.put("user", address);
-        payload.put("startTime", startMs);
-        payload.put("endTime", endMs);
         return postInfo(payload);
     }
 
@@ -1156,9 +1148,7 @@ public class Info {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "clearinghouseState");
         payload.put("user", address);
-        if (dex != null && !dex.isEmpty()) {
-            payload.put("dex", dex);
-        }
+        payload.put("dex", dex != null ? dex : "");
         return JSONUtil.convertValue(postInfo(payload), ClearinghouseState.class);
     }
 
@@ -1340,20 +1330,11 @@ public class Info {
     /**
      * Spot deploy auction status.
      *
+     * @param user User address
      * @return JSON response
      */
-    public JsonNode querySpotDeployAuctionStatus() {
-        // This interface corresponds to spotDeployState(user) in the Python SDK; the
-        // Java SDK already provides it
-        // spotDeployState(address)
-        // Keep this method to avoid breaking existing calls, but the server does not
-        // support spotDeploy queries without a user; return an empty object to avoid
-        // 4xx
-        try {
-            return JSONUtil.readTree("{}");
-        } catch (Exception e) {
-            throw new HypeError("Failed to parse empty JSON", e);
-        }
+    public JsonNode querySpotDeployAuctionStatus(String user) {
+        return spotDeployState(user);
     }
 
     /**
@@ -1388,6 +1369,19 @@ public class Info {
      */
     public JsonNode queryUserDexAbstractionState(String address) {
         Map<String, Object> payload = Map.of("type", "userDexAbstraction", "user", address);
+        return postInfo(payload);
+    }
+
+    /**
+     * Query user abstraction state.
+     *
+     * @param user User address
+     * @return JSON response
+     */
+    public JsonNode queryUserAbstractionState(String user) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("type", "userAbstraction");
+        payload.put("user", user);
         return postInfo(payload);
     }
 
@@ -1434,6 +1428,80 @@ public class Info {
         if (skipWs)
             throw new HypeError("WebSocket disabled by skipWs");
         wsManager.subscribe(subscription, callback);
+    }
+
+    /**
+     * Typed subscribe overload for UserFillsSubscription.
+     */
+    public void subscribe(UserFillsSubscription sub, java.util.function.Consumer<UserFillsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserFillsMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for UserFundingsSubscription.
+     */
+    public void subscribe(UserFundingsSubscription sub, java.util.function.Consumer<UserFundingsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserFundingsMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for UserNonFundingLedgerUpdatesSubscription.
+     */
+    public void subscribe(UserNonFundingLedgerUpdatesSubscription sub, java.util.function.Consumer<UserNonFundingLedgerMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserNonFundingLedgerMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for ActiveAssetCtxSubscription.
+     */
+    public void subscribe(ActiveAssetCtxSubscription sub, java.util.function.Consumer<ActiveAssetCtxMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), ActiveAssetCtxMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for ActiveAssetDataSubscription.
+     */
+    public void subscribe(ActiveAssetDataSubscription sub, java.util.function.Consumer<ActiveAssetDataMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), ActiveAssetDataMessage.class)));
+    }
+
+    /**
+     * Typed subscribe overload for OrderUpdatesSubscription.
+     */
+    public void subscribe(OrderUpdatesSubscription sub, java.util.function.Consumer<OrderUpdateMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> {
+            java.util.List<WsOrderUpdate> list = JSONUtil.toList(msg.get("data"), WsOrderUpdate.class);
+            OrderUpdateMessage m = new OrderUpdateMessage();
+            m.setOrders(list);
+            callback.accept(m);
+        });
+    }
+
+    /**
+     * Typed subscribe overload for TradesSubscription.
+     */
+    public void subscribe(TradesSubscription sub, java.util.function.Consumer<TradeMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> {
+            java.util.List<WsTrade> list = JSONUtil.toList(msg.get("data"), WsTrade.class);
+            TradeMessage m = new TradeMessage();
+            m.setTrades(list);
+            callback.accept(m);
+        });
+    }
+
+    /**
+     * Typed subscribe overload for UserEventsSubscription.
+     */
+    public void subscribe(UserEventsSubscription sub, java.util.function.Consumer<UserEventsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserEventsMessage.class)));
     }
 
     /**

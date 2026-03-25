@@ -77,7 +77,13 @@ public class WebsocketManager {
     /**
      * Externally configured maximum backoff limit in milliseconds (does not exceed internal limit)
      */
-    private long configMaxBackoffMs = maxBackoffMs;
+    private long configMaxBackoffMs = 5_000L;
+
+    /** Returns the currently configured maximum reconnect backoff in milliseconds. */
+    public long getConfigMaxBackoffMs() {
+        return configMaxBackoffMs;
+    }
+
     /**
      * Reference to scheduled reconnection task
      */

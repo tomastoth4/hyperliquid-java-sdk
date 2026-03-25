@@ -388,6 +388,42 @@ public class HyperliquidClient {
     }
 
     /**
+     * Create a testnet client from environment variables HP_PK and HL_PUBLIC_KEY.
+     * Equivalent to {@code fromEnv(false)}.
+     *
+     * @return configured HyperliquidClient connected to testnet
+     * @throws HypeError if HP_PK or HL_PUBLIC_KEY env vars are absent or blank
+     */
+    public static HyperliquidClient fromEnv() {
+        return fromEnv(false);
+    }
+
+    /**
+     * Create a client from environment variables HP_PK (private key) and HL_PUBLIC_KEY (wallet address).
+     *
+     * @param isMainnet true for mainnet, false for testnet
+     * @return configured HyperliquidClient
+     * @throws HypeError if HP_PK or HL_PUBLIC_KEY env vars are absent or blank
+     */
+    public static HyperliquidClient fromEnv(boolean isMainnet) {
+        String pk = System.getenv("HP_PK");
+        String publicKey = System.getenv("HL_PUBLIC_KEY");
+        if (pk == null || pk.isBlank()) {
+            throw new HypeError("Environment variable HP_PK is not set or blank.");
+        }
+        if (publicKey == null || publicKey.isBlank()) {
+            throw new HypeError("Environment variable HL_PUBLIC_KEY is not set or blank.");
+        }
+        // addApiWallet(primaryWalletAddress, apiWalletPrivateKey): HP_PK is the API/agent key,
+        // HL_PUBLIC_KEY is the master wallet address it acts on behalf of.
+        Builder builder = builder().addApiWallet(publicKey, pk);
+        if (!isMainnet) {
+            builder.testNetUrl();
+        }
+        return builder.build();
+    }
+
+    /**
      * Create a new builder for constructing {@link HyperliquidClient}.
      *
      * @return Builder instance

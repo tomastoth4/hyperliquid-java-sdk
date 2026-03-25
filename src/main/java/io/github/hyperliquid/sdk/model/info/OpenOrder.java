@@ -32,6 +32,10 @@ public class OpenOrder {
      * Creation timestamp (milliseconds)
      */
     private Long timestamp;
+    /**
+     * Client order ID (nullable)
+     */
+    private String cloid;
 
     // Getter and Setter methods
     public String getCoin() {
@@ -80,5 +84,13 @@ public class OpenOrder {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getCloid() {
+        return cloid;
+    }
+
+    public void setCloid(String cloid) {
+        this.cloid = cloid;
     }
 }
