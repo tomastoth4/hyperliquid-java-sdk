@@ -1,6 +1,9 @@
 package io.github.hyperliquid.sdk.model.subscription;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Locale;
 
@@ -10,23 +13,26 @@ import java.util.Locale;
  * Subscribe to candle data for specified currency and time period, including open, high, low, close, and volume.
  * </p>
  */
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class CandleSubscription extends Subscription {
-    
+
     @JsonProperty("type")
     private final String type = "candle";
-    
+
     @JsonProperty("coin")
     private String coin;
-    
+
     @JsonProperty("interval")
     private String interval;
-    
+
     /**
      * Construct candle subscription (no-argument constructor, used for Jackson deserialization).
      */
     public CandleSubscription() {
     }
-    
+
     /**
      * Construct candle subscription.
      *
@@ -37,7 +43,7 @@ public class CandleSubscription extends Subscription {
         this.coin = coin;
         this.interval = interval;
     }
-    
+
     /**
      * Static factory method: create candle subscription.
      *
@@ -48,28 +54,20 @@ public class CandleSubscription extends Subscription {
     public static CandleSubscription of(String coin, String interval) {
         return new CandleSubscription(coin, interval);
     }
-    
+
     @Override
     public String getType() {
         return type;
     }
-    
-    public String getCoin() {
-        return coin;
-    }
-    
+
     public void setCoin(String coin) {
         this.coin = coin;
     }
-    
-    public String getInterval() {
-        return interval;
-    }
-    
+
     public void setInterval(String interval) {
         this.interval = interval;
     }
-    
+
     @Override
     public String toIdentifier() {
         if (coin == null || interval == null) {

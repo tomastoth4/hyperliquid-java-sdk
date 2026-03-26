@@ -1,161 +1,43 @@
 package io.github.hyperliquid.sdk.model.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
+
 import java.util.List;
 
 /** Frontend open order entity wrapper (carrying trigger/take-profit/stop-loss and other additional information) */
+@Value
 public class FrontendOpenOrder {
     /** Currency (e.g., "BTC" or Spot index "@107") */
-    private String coin;
+    String coin;
     /** Whether it is a position take-profit/stop-loss order */
-    private Boolean isPositionTpsl;
-    /** Whether it is a trigger order */
-    private Boolean isTrigger;
-    /** Limit price (string) */
-    private String limitPx;
-    /** Order ID */
-    private Long oid;
-    /** Order type description */
-    private String orderType;
-    /** Original order quantity (string) */
-    private String origSz;
-    /** Whether to reduce position only */
-    private Boolean reduceOnly;
-    /** Direction (A/B or Buy/Sell) */
-    private String side;
-    /** Current remaining quantity (string) */
-    private String sz;
-    /** Creation timestamp (milliseconds) */
-    private Long timestamp;
-    /** Trigger condition (cross above/cross below, etc.) */
-    private String triggerCondition;
-    /** Trigger price (string) */
-    private String triggerPx;
-    /** Time-in-force (nullable) */
-    private String tif;
-    /** Sub-orders (nullable) */
-    private List<FrontendOpenOrder> children;
-
-    // Getter and Setter methods
-    public String getCoin() {
-        return coin;
-    }
-
-    public void setCoin(String coin) {
-        this.coin = coin;
-    }
-
     @JsonProperty("isPositionTpsl")
-    public Boolean getIsPositionTpsl() {
-        return isPositionTpsl;
-    }
-
-    public void setIsPositionTpsl(Boolean isPositionTpsl) {
-        this.isPositionTpsl = isPositionTpsl;
-    }
-
+    Boolean isPositionTpsl;
+    /** Whether it is a trigger order */
     @JsonProperty("isTrigger")
-    public Boolean getIsTrigger() {
-        return isTrigger;
-    }
-
-    public void setIsTrigger(Boolean isTrigger) {
-        this.isTrigger = isTrigger;
-    }
-
-    public String getLimitPx() {
-        return limitPx;
-    }
-
-    public void setLimitPx(String limitPx) {
-        this.limitPx = limitPx;
-    }
-
-    public Long getOid() {
-        return oid;
-    }
-
-    public void setOid(Long oid) {
-        this.oid = oid;
-    }
-
-    public String getOrderType() {
-        return orderType;
-    }
-
-    public void setOrderType(String orderType) {
-        this.orderType = orderType;
-    }
-
-    public String getOrigSz() {
-        return origSz;
-    }
-
-    public void setOrigSz(String origSz) {
-        this.origSz = origSz;
-    }
-
-    public Boolean getReduceOnly() {
-        return reduceOnly;
-    }
-
-    public void setReduceOnly(Boolean reduceOnly) {
-        this.reduceOnly = reduceOnly;
-    }
-
-    public String getSide() {
-        return side;
-    }
-
-    public void setSide(String side) {
-        this.side = side;
-    }
-
-    public String getSz() {
-        return sz;
-    }
-
-    public void setSz(String sz) {
-        this.sz = sz;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getTriggerCondition() {
-        return triggerCondition;
-    }
-
-    public void setTriggerCondition(String triggerCondition) {
-        this.triggerCondition = triggerCondition;
-    }
-
-    public String getTriggerPx() {
-        return triggerPx;
-    }
-
-    public void setTriggerPx(String triggerPx) {
-        this.triggerPx = triggerPx;
-    }
-
-    public String getTif() {
-        return tif;
-    }
-
-    public void setTif(String tif) {
-        this.tif = tif;
-    }
-
-    public List<FrontendOpenOrder> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<FrontendOpenOrder> children) {
-        this.children = children;
-    }
+    Boolean isTrigger;
+    /** Limit price (string) */
+    String limitPx;
+    /** Order ID */
+    Long oid;
+    /** Order type description */
+    String orderType;
+    /** Original order quantity (string) */
+    String origSz;
+    /** Whether to reduce position only */
+    Boolean reduceOnly;
+    /** Direction (A/B or Buy/Sell) */
+    String side;
+    /** Current remaining quantity (string) */
+    String sz;
+    /** Creation timestamp (milliseconds) */
+    Long timestamp;
+    /** Trigger condition (cross above/cross below, etc.) */
+    String triggerCondition;
+    /** Trigger price (string) */
+    String triggerPx;
+    /** Time-in-force (nullable) */
+    String tif;
+    /** Sub-orders (nullable) */
+    List<FrontendOpenOrder> children;
 }

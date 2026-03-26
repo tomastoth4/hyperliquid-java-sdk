@@ -1,5 +1,9 @@
 package io.github.hyperliquid.sdk.model.order;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.List;
 
 /**
@@ -8,6 +12,9 @@ import java.util.List;
  * Used to automatically infer the grouping parameter of bulkOrders, simplifying API calls.
  * </p>
  */
+@Getter
+@ToString
+@EqualsAndHashCode
 public class OrderGroup {
     /**
      * Order list
@@ -22,13 +29,5 @@ public class OrderGroup {
     public OrderGroup(List<OrderRequest> orders, GroupingType groupingType) {
         this.orders = orders;
         this.groupingType = groupingType;
-    }
-
-    public List<OrderRequest> getOrders() {
-        return orders;
-    }
-
-    public GroupingType getGroupingType() {
-        return groupingType;
     }
 }

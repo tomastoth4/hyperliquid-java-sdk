@@ -138,7 +138,7 @@ public final class Signing {
         }
         if (orderType.getTrigger() != null) {
             Map<String, Object> trigObj = new LinkedHashMap<>();
-            trigObj.put("isMarket", orderType.getTrigger().isMarket());
+            trigObj.put("isMarket", orderType.getTrigger().getIsMarket());
             // Important: triggerPx must also be converted via floatToWire
             String triggerPx = orderType.getTrigger().getTriggerPx();
             if (triggerPx != null && !triggerPx.isEmpty()) {

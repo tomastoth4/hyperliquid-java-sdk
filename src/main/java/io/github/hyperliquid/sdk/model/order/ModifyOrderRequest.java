@@ -1,11 +1,14 @@
 package io.github.hyperliquid.sdk.model.order;
 
+import lombok.Data;
+
 /**
  * Order modification request wrapper.
  * <p>
  * Used for batch order modification, supports locating orders via OID or Cloid.
  * </p>
  */
+@Data
 public class ModifyOrderRequest {
 
     /**
@@ -69,10 +72,6 @@ public class ModifyOrderRequest {
      */
     private Cloid cloid;
 
-    public ModifyOrderRequest() {
-    }
-
-
     public static ModifyOrderRequest byOid(String coin, Long oid) {
         ModifyOrderRequest modifyOrderRequest = new ModifyOrderRequest();
         modifyOrderRequest.setOid(oid);
@@ -88,68 +87,7 @@ public class ModifyOrderRequest {
         this.orderType = new OrderType(limit);
     }
 
-    public Long getOid() {
-        return oid;
-    }
-
-    public void setOid(Long oid) {
-        this.oid = oid;
-    }
-
-    public String getCoin() {
-        return coin;
-    }
-
-    public void setCoin(String coin) {
-        this.coin = coin;
-    }
-
-    public Boolean getIsBuy() {
-        return isBuy;
-    }
-
     public Boolean isBuy() {
         return isBuy;
-    }
-
-    public void setBuy(Boolean buy) {
-        isBuy = buy;
-    }
-
-    public String getSz() {
-        return sz;
-    }
-
-    public void setSz(String sz) {
-        this.sz = sz;
-    }
-
-    public String getLimitPx() {
-        return limitPx;
-    }
-
-    public void setLimitPx(String limitPx) {
-        this.limitPx = limitPx;
-    }
-
-    public OrderType getOrderType() {
-        return orderType;
-    }
-
-
-    public Boolean getReduceOnly() {
-        return reduceOnly;
-    }
-
-    public void setReduceOnly(Boolean reduceOnly) {
-        this.reduceOnly = reduceOnly;
-    }
-
-    public Cloid getCloid() {
-        return cloid;
-    }
-
-    public void setCloid(Cloid cloid) {
-        this.cloid = cloid;
     }
 }

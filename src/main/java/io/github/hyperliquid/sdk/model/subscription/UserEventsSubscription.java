@@ -1,6 +1,9 @@
 package io.github.hyperliquid.sdk.model.subscription;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * User events subscription.
@@ -9,17 +12,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * This subscription does not require specifying a user address, automatically uses the currently logged-in user.
  * </p>
  */
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class UserEventsSubscription extends Subscription {
-    
+
     @JsonProperty("type")
     private final String type = "userEvents";
-    
+
     /**
      * Construct user events subscription.
      */
     public UserEventsSubscription() {
     }
-    
+
     /**
      * Static factory method: create user events subscription.
      *
@@ -28,7 +34,7 @@ public class UserEventsSubscription extends Subscription {
     public static UserEventsSubscription create() {
         return new UserEventsSubscription();
     }
-    
+
     @Override
     public String getType() {
         return type;

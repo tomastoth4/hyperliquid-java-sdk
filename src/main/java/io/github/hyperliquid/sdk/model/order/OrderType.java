@@ -1,9 +1,16 @@
 package io.github.hyperliquid.sdk.model.order;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 /**
  * Order type wrapper: limit (TIF) and trigger (TPSL) can be chosen alternatively;
  * If both exist, only the parsing behavior defined by the backend takes effect (generally not set at the same time).
  */
+@Getter
+@ToString
+@EqualsAndHashCode
 public class OrderType {
 
     private final LimitOrderType limit;
@@ -57,24 +64,4 @@ public class OrderType {
     public static OrderType trigger(TriggerOrderType trigger) {
         return new OrderType(trigger);
     }
-
-
-    /**
-     * Get limit order type.
-     *
-     * @return limit order type (may be null)
-     */
-    public LimitOrderType getLimit() {
-        return limit;
-    }
-
-    /**
-     * Get trigger order type.
-     *
-     * @return trigger order type (may be null)
-     */
-    public TriggerOrderType getTrigger() {
-        return trigger;
-    }
 }
-

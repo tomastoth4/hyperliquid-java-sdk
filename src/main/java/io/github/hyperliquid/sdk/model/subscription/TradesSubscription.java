@@ -1,6 +1,9 @@
 package io.github.hyperliquid.sdk.model.subscription;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Locale;
 
@@ -10,20 +13,23 @@ import java.util.Locale;
  * Subscribe to each real-time trade data for specified currency, including price, quantity, direction, and time.
  * </p>
  */
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class TradesSubscription extends Subscription {
-    
+
     @JsonProperty("type")
     private final String type = "trades";
-    
+
     @JsonProperty("coin")
     private String coin;
-    
+
     /**
      * Construct tick-by-tick trade subscription (no-argument constructor, used for Jackson deserialization).
      */
     public TradesSubscription() {
     }
-    
+
     /**
      * Construct tick-by-tick trade subscription.
      *
@@ -32,7 +38,7 @@ public class TradesSubscription extends Subscription {
     public TradesSubscription(String coin) {
         this.coin = coin;
     }
-    
+
     /**
      * Static factory method: create tick-by-tick trade subscription.
      *
@@ -42,20 +48,16 @@ public class TradesSubscription extends Subscription {
     public static TradesSubscription of(String coin) {
         return new TradesSubscription(coin);
     }
-    
+
     @Override
     public String getType() {
         return type;
     }
-    
-    public String getCoin() {
-        return coin;
-    }
-    
+
     public void setCoin(String coin) {
         this.coin = coin;
     }
-    
+
     @Override
     public String toIdentifier() {
         if (coin == null) {

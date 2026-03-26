@@ -158,10 +158,7 @@ public class Exchange {
         action.put("t", twapId);
         JsonNode response = postAction(action);
         // Response: {"status":"ok","response":{"type":"twapCancel","data":{"status":"success"}}}
-        TwapCancelResult result = new TwapCancelResult();
-        result.setTwapId(twapId);
-        result.setStatus(response.path("response").path("data").path("status").asText());
-        return result;
+        return new TwapCancelResult(twapId, response.path("response").path("data").path("status").asText());
     }
 
     /**
@@ -314,7 +311,7 @@ public class Exchange {
                             .setScale(decimals, RoundingMode.HALF_UP);
                     String newPx = bd.stripTrailingZeros().toPlainString();
                     TriggerOrderType oldTrig = req.getOrderType().getTrigger();
-                    TriggerOrderType newTrig = new TriggerOrderType(newPx, oldTrig.isMarket(), oldTrig.getTpslEnum());
+                    TriggerOrderType newTrig = new TriggerOrderType(newPx, oldTrig.getIsMarket(), oldTrig.getTpslEnum());
                     LimitOrderType oldLimit = req.getOrderType().getLimit();
                     req.setOrderType(new OrderType(oldLimit, newTrig));
                 } catch (NumberFormatException e) {
