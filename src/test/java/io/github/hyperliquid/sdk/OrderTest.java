@@ -371,7 +371,7 @@ public class OrderTest {
         //{"status":"err","response":"Cannot modify canceled or filled order"}
         //{"status":"ok","response":{"type":"default"}}
         ModifyOrderRequest req = ModifyOrderRequest.byOid("BTC", 000L);
-        req.setBuy(false);
+        req.setIsBuy(false);
         req.setLimitPx("91000.0");
         req.setSz("0");
         req.setReduceOnly(true);
@@ -384,14 +384,14 @@ public class OrderTest {
     @Test
     public void testModifyOrders() {
         ModifyOrderRequest req1 = ModifyOrderRequest.byOid("BTC", 0000L);
-        req1.setBuy(Boolean.FALSE);
+        req1.setIsBuy(Boolean.FALSE);
         req1.setLimitPx("85100.0");
         req1.setSz("0.001");
         req1.setReduceOnly(Boolean.TRUE);
         req1.setOrderType(TriggerOrderType.sl("85100.0", Boolean.TRUE));
 
         ModifyOrderRequest req2 = ModifyOrderRequest.byOid("BTC", 0000L);
-        req2.setBuy(Boolean.FALSE);
+        req2.setIsBuy(Boolean.FALSE);
         req2.setLimitPx("89100.0");
         req2.setSz("0.001");
         req2.setReduceOnly(Boolean.TRUE);

@@ -1,8 +1,15 @@
 package io.github.hyperliquid.sdk.model.order;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+
 /**
  * Trigger order type: carries trigger price, whether to execute at market price, and trigger direction (tp/sl).
  */
+@Getter
+@ToString
+@EqualsAndHashCode
 public class TriggerOrderType {
     /**
      * Trigger price (string)
@@ -63,21 +70,6 @@ public class TriggerOrderType {
 
     public static TriggerOrderType sl(String triggerPx, boolean isMarket) {
         return new TriggerOrderType(triggerPx, isMarket, TpslType.SL);
-    }
-
-
-    /**
-     * Get trigger price
-     */
-    public String getTriggerPx() {
-        return triggerPx;
-    }
-
-    /**
-     * Whether to trigger execution at market price
-     */
-    public boolean isMarket() {
-        return isMarket;
     }
 
     /**

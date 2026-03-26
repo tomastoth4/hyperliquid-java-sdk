@@ -1,11 +1,9 @@
 package io.github.hyperliquid.sdk.model.order;
 
-public class TwapCancelResult {
-    private Long twapId;
-    private String status;
+import lombok.Value;
 
-    public Long getTwapId() { return twapId; }
-    public void setTwapId(Long twapId) { this.twapId = twapId; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+@Value
+public class TwapCancelResult {
+    Long twapId;
+    String status;
 }

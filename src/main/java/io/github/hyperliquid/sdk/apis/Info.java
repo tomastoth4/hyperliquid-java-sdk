@@ -1477,9 +1477,7 @@ public class Info {
         if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
         wsManager.subscribe(sub, msg -> {
             java.util.List<WsOrderUpdate> list = JSONUtil.toList(msg.get("data"), WsOrderUpdate.class);
-            OrderUpdateMessage m = new OrderUpdateMessage();
-            m.setOrders(list);
-            callback.accept(m);
+            callback.accept(new OrderUpdateMessage(list));
         });
     }
 
@@ -1490,9 +1488,7 @@ public class Info {
         if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
         wsManager.subscribe(sub, msg -> {
             java.util.List<WsTrade> list = JSONUtil.toList(msg.get("data"), WsTrade.class);
-            TradeMessage m = new TradeMessage();
-            m.setTrades(list);
-            callback.accept(m);
+            callback.accept(new TradeMessage(list));
         });
     }
 

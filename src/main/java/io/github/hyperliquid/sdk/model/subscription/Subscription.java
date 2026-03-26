@@ -2,6 +2,8 @@ package io.github.hyperliquid.sdk.model.subscription;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * WebSocket subscription base class.
@@ -11,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
+@EqualsAndHashCode
 public abstract class Subscription {
     
     /**

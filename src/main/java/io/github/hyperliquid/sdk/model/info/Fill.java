@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
  * <p>Note: Official return fields may vary across different interfaces and versions, while preserving complete information for SDK users.</p>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class Fill {
 
     /**
@@ -32,6 +34,7 @@ public class Fill {
     /**
      * true for buy, false for sell
      */
+    @JsonProperty("isBuy")
     private Boolean isBuy;
     /**
      * Execution quantity
@@ -46,67 +49,6 @@ public class Fill {
      * Extra fields container (for compatibility with different return structures)
      */
     private Map<String, Object> extensions = new HashMap<>();
-
-    public Fill() {
-    }
-
-    // Getter and Setter methods
-    public Long getTime() {
-        return time;
-    }
-
-    public void setTime(Long time) {
-        this.time = time;
-    }
-
-    public Integer getCoin() {
-        return coin;
-    }
-
-    public void setCoin(Integer coin) {
-        this.coin = coin;
-    }
-
-    public String getCoinName() {
-        return coinName;
-    }
-
-    public void setCoinName(String coinName) {
-        this.coinName = coinName;
-    }
-
-    @JsonProperty("isBuy")
-    public Boolean getIsBuy() {
-        return isBuy;
-    }
-
-    public void setIsBuy(Boolean isBuy) {
-        this.isBuy = isBuy;
-    }
-
-    public Double getSize() {
-        return size;
-    }
-
-    public void setSize(Double size) {
-        this.size = size;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public Map<String, Object> getExtensions() {
-        return extensions;
-    }
-
-    public void setExtensions(Map<String, Object> extensions) {
-        this.extensions = extensions;
-    }
 
     /**
      * Builder builder, for friendly creation.

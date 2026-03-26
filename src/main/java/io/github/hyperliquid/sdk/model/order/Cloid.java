@@ -3,6 +3,7 @@ package io.github.hyperliquid.sdk.model.order;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.github.hyperliquid.sdk.utils.HypeError;
+import lombok.EqualsAndHashCode;
 import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
@@ -20,6 +21,7 @@ import java.security.SecureRandom;
  * - from_str(cloid: str) directly wraps;
  * - to_raw() returns the raw string.
  */
+@EqualsAndHashCode
 public class Cloid {
 
     /**

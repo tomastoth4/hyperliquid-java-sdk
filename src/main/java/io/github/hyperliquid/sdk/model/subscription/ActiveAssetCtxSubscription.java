@@ -1,10 +1,16 @@
 package io.github.hyperliquid.sdk.model.subscription;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Active Asset Context Subscription
  */
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class ActiveAssetCtxSubscription extends Subscription {
 
     @JsonProperty("type")

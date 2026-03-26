@@ -1,10 +1,9 @@
 package io.github.hyperliquid.sdk.model.websocket;
 
+import lombok.Value;
 import java.util.List;
 
+@Value
 public class OrderUpdateMessage {
-    private List<WsOrderUpdate> orders;
-
-    public List<WsOrderUpdate> getOrders() { return orders; }
-    public void setOrders(List<WsOrderUpdate> orders) { this.orders = orders; }
+    List<WsOrderUpdate> orders;
 }

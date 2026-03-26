@@ -2,6 +2,8 @@ package io.github.hyperliquid.sdk.model.order;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Order wire (wire) internal representation, used to construct the final action payload sent to the server.
@@ -12,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * - Conversion logic see `io.github.hyperliquid.sdk.utils.Signing.orderWiresToOrderAction` and `writeMsgpack`;
  * - `sz` and `limitPx` fields are in string form, need to be normalized via `Signing.floatToWire` to avoid unacceptable rounding.
  */
+@ToString
+@EqualsAndHashCode
 public class OrderWire {
     /**
      * Asset integer ID (Perp for contract assets, Spot for spot assets)

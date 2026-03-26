@@ -1,10 +1,18 @@
 package io.github.hyperliquid.sdk.model.wallet;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.web3j.crypto.Credentials;
 
 /**
  * API wallet
  **/
+@Getter
+@Setter
+@ToString(exclude = {"apiWalletPrivateKey", "credentials"})
+@EqualsAndHashCode(exclude = {"apiWalletPrivateKey", "credentials"})
 public class ApiWallet {
 
     /**
@@ -47,37 +55,5 @@ public class ApiWallet {
 
     public ApiWallet(String privateKey) {
         this.apiWalletPrivateKey = privateKey;
-    }
-
-    public String getPrimaryWalletAddress() {
-        return primaryWalletAddress;
-    }
-
-    public void setPrimaryWalletAddress(String primaryWalletAddress) {
-        this.primaryWalletAddress = primaryWalletAddress;
-    }
-
-    public String getApiWalletPrivateKey() {
-        return apiWalletPrivateKey;
-    }
-
-    public void setApiWalletPrivateKey(String apiWalletPrivateKey) {
-        this.apiWalletPrivateKey = apiWalletPrivateKey;
-    }
-
-    public Credentials getCredentials() {
-        return credentials;
-    }
-
-    public void setCredentials(Credentials credentials) {
-        this.credentials = credentials;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
     }
 }

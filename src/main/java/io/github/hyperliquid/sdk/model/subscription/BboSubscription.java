@@ -1,6 +1,9 @@
 package io.github.hyperliquid.sdk.model.subscription;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Locale;
 
@@ -10,20 +13,23 @@ import java.util.Locale;
  * Subscribe to the best bid and ask prices and their quantities for specified currency, more concise data, faster updates.
  * </p>
  */
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class BboSubscription extends Subscription {
-    
+
     @JsonProperty("type")
     private final String type = "bbo";
-    
+
     @JsonProperty("coin")
     private String coin;
-    
+
     /**
      * Construct BBO subscription (no-argument constructor, used for Jackson deserialization).
      */
     public BboSubscription() {
     }
-    
+
     /**
      * Construct BBO subscription.
      *
@@ -32,7 +38,7 @@ public class BboSubscription extends Subscription {
     public BboSubscription(String coin) {
         this.coin = coin;
     }
-    
+
     /**
      * Static factory method: create BBO subscription.
      *
@@ -42,20 +48,16 @@ public class BboSubscription extends Subscription {
     public static BboSubscription of(String coin) {
         return new BboSubscription(coin);
     }
-    
+
     @Override
     public String getType() {
         return type;
     }
-    
-    public String getCoin() {
-        return coin;
-    }
-    
+
     public void setCoin(String coin) {
         this.coin = coin;
     }
-    
+
     @Override
     public String toIdentifier() {
         if (coin == null) {
