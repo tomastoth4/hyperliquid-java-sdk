@@ -41,6 +41,8 @@ public class UserFill {
     String twapId;
     /** Builder fee (string, if applicable) */
     String builderFee;
+    /** Client order ID (0x-prefixed hex, null if not set by the order placer) */
+    String cloid;
 
     // Utility method - determine if it is a spot trade
     public boolean isSpotTrade() {
