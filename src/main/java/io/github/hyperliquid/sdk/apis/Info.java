@@ -449,27 +449,13 @@ public class Info {
     }
 
     /**
-     * Retrieves perpetual asset-related information from the Hyperliquid API.
-     * <p>
-     * This includes details such as pricing, current funding rates, open contracts,
-     * and other contextual data for perpetual markets. The raw JSON response is returned.
-     * </p>
+     * Get perp metadata and asset context.
      *
-     * @return A {@link JsonNode} containing the raw JSON response with perpetual asset information.
+     * @return Typed model {@link MetaAndAssetCtxs}
      */
-    public JsonNode metaAndAssetCtxs() {
+    public MetaAndAssetCtxs metaAndAssetCtxs() {
         Map<String, Object> payload = Map.of("type", "metaAndAssetCtxs");
-        return postInfo(payload);
-    }
-
-    /**
-     * Get perp metadata and asset context (typed return).
-     *
-     * @return Typed model MetaAndAssetCtxs
-     */
-    public MetaAndAssetCtxs metaAndAssetCtxsTyped() {
-        JsonNode node = metaAndAssetCtxs();
-        return JSONUtil.convertValue(node, MetaAndAssetCtxs.class);
+        return JSONUtil.convertValue(postInfo(payload), MetaAndAssetCtxs.class);
     }
 
     /**
@@ -555,13 +541,13 @@ public class Info {
     }
 
     /**
-     * Query spot metadata and asset context (spotMetaAndAssetCtxs).
+     * Query spot metadata and asset context.
      *
-     * @return JSON response
+     * @return Typed model {@link SpotMetaAndAssetCtxs}
      */
-    public JsonNode spotMetaAndAssetCtxs() {
+    public SpotMetaAndAssetCtxs spotMetaAndAssetCtxs() {
         Map<String, Object> payload = Map.of("type", "spotMetaAndAssetCtxs");
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), SpotMetaAndAssetCtxs.class);
     }
 
     /**
@@ -912,11 +898,11 @@ public class Info {
      * Query user fees (rebates/commissions).
      *
      * @param address User address
-     * @return JSON response
+     * @return Typed model {@link UserFees}
      */
-    public JsonNode userFees(String address) {
+    public UserFees userFees(String address) {
         Map<String, Object> payload = Map.of("type", "userFees", "user", address);
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), UserFees.class);
     }
 
     /**
@@ -938,18 +924,13 @@ public class Info {
 
     /**
      * Query user funding rate history with optional end time.
-     * <p>
-     * This is a convenience method that calls
-     * {@link #userFundingHistory(String, long, Long)} with a null value
-     * for endMs, allowing the API to use its default end time.
-     * </p>
      *
      * @param address User address
      * @param startMs Start milliseconds
      * @param endMs   End milliseconds (optional, can be null)
-     * @return JSON response
+     * @return List of {@link UserFundingEntry}
      */
-    public JsonNode userFundingHistory(String address, long startMs, Long endMs) {
+    public List<UserFundingEntry> userFundingHistory(String address, long startMs, Long endMs) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userFunding");
         payload.put("user", address);
@@ -957,23 +938,19 @@ public class Info {
         if (endMs != null) {
             payload.put("endTime", endMs);
         }
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), UserFundingEntry.class);
     }
 
     /**
      * Query user funding rate history by asset ID.
-     * <p>
-     * This method converts the asset ID to the required coin string format
-     * and delegates to {@link #userFundingHistory(String, String, long, long)}.
-     * </p>
      *
      * @param address User address
      * @param coin    Asset ID
      * @param startMs Start milliseconds
      * @param endMs   End milliseconds
-     * @return JSON response
+     * @return List of {@link UserFundingEntry}
      */
-    public JsonNode userFundingHistory(String address, int coin, long startMs, long endMs) {
+    public List<UserFundingEntry> userFundingHistory(String address, int coin, long startMs, long endMs) {
         return this.userFundingHistory(address, this.coinIdToInfoCoinString(coin), startMs, endMs);
     }
 
@@ -1004,16 +981,16 @@ public class Info {
      * @param coin    Coin name or internal identifier (e.g., "BTC" or "@107")
      * @param startMs Start milliseconds
      * @param endMs   End milliseconds
-     * @return JSON response
+     * @return List of {@link UserFundingEntry}
      */
-    public JsonNode userFundingHistory(String address, String coin, long startMs, long endMs) {
+    public List<UserFundingEntry> userFundingHistory(String address, String coin, long startMs, long endMs) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userFunding");
         payload.put("user", address);
         payload.put("coin", coin);
         payload.put("startTime", startMs);
         payload.put("endTime", endMs);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), UserFundingEntry.class);
     }
 
     /**
@@ -1022,41 +999,41 @@ public class Info {
      * @param address User address
      * @param startMs Start milliseconds
      * @param endMs   End milliseconds
-     * @return JSON response
+     * @return List of {@link LedgerUpdate}
      */
-    public JsonNode userNonFundingLedgerUpdates(String address, long startMs, long endMs) {
+    public List<LedgerUpdate> userNonFundingLedgerUpdates(String address, long startMs, long endMs) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userNonFundingLedgerUpdates");
         payload.put("user", address);
         payload.put("startTime", startMs);
         payload.put("endTime", endMs);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), LedgerUpdate.class);
     }
 
     /**
      * Historical order query.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of {@link HistoricalOrder}
      */
-    public JsonNode historicalOrders(String address) {
+    public List<HistoricalOrder> historicalOrders(String address) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "historicalOrders");
         payload.put("user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), HistoricalOrder.class);
     }
 
     /**
      * User TWAP slice fill query.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of {@link TwapSliceFill}
      */
-    public JsonNode userTwapSliceFills(String address) {
+    public List<TwapSliceFill> userTwapSliceFills(String address) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userTwapSliceFills");
         payload.put("user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), TwapSliceFill.class);
     }
 
     /**
@@ -1114,27 +1091,13 @@ public class Info {
     }
 
     /**
-     * Query all perpetual dexs (perpDexs).
+     * Query all perpetual dexs.
      *
-     * @return JSON array
+     * @return List of {@link PerpDex}
      */
-    public JsonNode perpDexs() {
+    public List<PerpDex> perpDexs() {
         Map<String, Object> payload = Map.of("type", "perpDexs");
-        return postInfo(payload);
-    }
-
-    /**
-     * Query all perpetual dexs (typed return).
-     * Elements may be null or objects, use Map to receive to adapt to field
-     * changes.
-     *
-     * @return Perp dex list (elements are Map or null)
-     */
-    public List<Map<String, Object>> perpDexsTyped() {
-        JsonNode node = perpDexs();
-        return JSONUtil.convertValue(node,
-                TypeFactory.defaultInstance().constructCollectionType(List.class,
-                        TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class)));
+        return JSONUtil.toList(postInfo(payload), PerpDex.class);
     }
 
     /**
@@ -1189,49 +1152,49 @@ public class Info {
      *
      * @param vaultAddress Vault address
      * @param user         User address (optional)
-     * @return JSON response
+     * @return Typed model {@link VaultDetails}
      */
-    public JsonNode vaultDetails(String vaultAddress, String user) {
+    public VaultDetails vaultDetails(String vaultAddress, String user) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "vaultDetails");
         payload.put("vaultAddress", vaultAddress);
         if (user != null) {
             payload.put("user", user);
         }
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), VaultDetails.class);
     }
 
     /**
      * Spot Deploy Auction status.
      *
      * @param address User address
-     * @return JSON response
+     * @return Typed model {@link SpotDeployState}
      */
-    public JsonNode spotDeployState(String address) {
+    public SpotDeployState spotDeployState(String address) {
         Map<String, Object> payload = Map.of("type", "spotDeployState", "user", address);
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), SpotDeployState.class);
     }
 
     /**
      * User portfolio.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of {@link PortfolioEntry}
      */
-    public JsonNode portfolio(String address) {
+    public List<PortfolioEntry> portfolio(String address) {
         Map<String, Object> payload = Map.of("type", "portfolio", "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), PortfolioEntry.class);
     }
 
     /**
      * User position fee rate and level (userRole).
      *
      * @param address User address
-     * @return JSON response
+     * @return Typed model {@link UserRole}
      */
-    public JsonNode userRole(String address) {
+    public UserRole userRole(String address) {
         Map<String, Object> payload = Map.of("type", "userRole", "user", address);
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), UserRole.class);
     }
 
     /**
@@ -1288,123 +1251,112 @@ public class Info {
      * Query referrer status (queryReferralState).
      *
      * @param address User address
-     * @return JSON response
+     * @return Typed model {@link ReferralState}
      */
-    public JsonNode queryReferralState(String address) {
+    public ReferralState queryReferralState(String address) {
         Map<String, Object> payload = Map.of("type", "referral", "user", address);
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), ReferralState.class);
     }
 
     /**
      * Query sub-account list.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of {@link SubAccount}
      */
-    public JsonNode querySubAccounts(String address) {
+    public List<SubAccount> querySubAccounts(String address) {
         Map<String, Object> payload = Map.of("type", "subAccounts", "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), SubAccount.class);
     }
 
     /**
      * Query user to multi-signature signer mapping.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of signer addresses
      */
-    public JsonNode queryUserToMultiSigSigners(String address) {
+    public List<String> queryUserToMultiSigSigners(String address) {
         Map<String, Object> payload = Map.of("type", "userToMultiSigSigners", "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), String.class);
     }
 
     /**
      * Perpetual deploy auction status.
      *
-     * @return JSON response
+     * @return Typed model {@link DeployAuctionStatus}
      */
-    public JsonNode queryPerpDeployAuctionStatus() {
+    public DeployAuctionStatus queryPerpDeployAuctionStatus() {
         Map<String, Object> payload = Map.of("type", "perpDeployAuctionStatus");
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), DeployAuctionStatus.class);
     }
 
     /**
      * Spot deploy auction status.
      *
      * @param user User address
-     * @return JSON response
+     * @return Typed model {@link SpotDeployState}
      */
-    public JsonNode querySpotDeployAuctionStatus(String user) {
+    public SpotDeployState querySpotDeployAuctionStatus(String user) {
         return spotDeployState(user);
     }
 
     /**
-     * Get Perp market status (perpDexStatus).
+     * Get Perp market status.
      *
      * @param dex Perp dex name; empty string represents the first perp dex
-     * @return JSON object
+     * @return Typed model {@link PerpDexStatus}
      */
-    public JsonNode perpDexStatus(String dex) {
+    public PerpDexStatus perpDexStatus(String dex) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "perpDexStatus");
         payload.put("dex", dex == null ? "" : dex);
-        return postInfo(payload);
-    }
-
-    /**
-     * Get Perp market status (typed return).
-     *
-     * @param dex Perp dex name; empty string represents the first perp dex
-     * @return Typed model PerpDexStatus
-     */
-    public PerpDexStatus perpDexStatusTyped(String dex) {
-        JsonNode node = perpDexStatus(dex);
-        return JSONUtil.convertValue(node, PerpDexStatus.class);
+        return JSONUtil.convertValue(postInfo(payload), PerpDexStatus.class);
     }
 
     /**
      * Query user DEX abstraction state.
      *
      * @param address User address
-     * @return JSON response
+     * @return Whether the user has DEX abstraction enabled
      */
-    public JsonNode queryUserDexAbstractionState(String address) {
+    public boolean queryUserDexAbstractionState(String address) {
         Map<String, Object> payload = Map.of("type", "userDexAbstraction", "user", address);
-        return postInfo(payload);
+        return postInfo(payload).asBoolean();
     }
 
     /**
      * Query user abstraction state.
      *
      * @param user User address
-     * @return JSON response
+     * @return Abstraction state as a string
      */
-    public JsonNode queryUserAbstractionState(String user) {
+    public String queryUserAbstractionState(String user) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("type", "userAbstraction");
         payload.put("user", user);
-        return postInfo(payload);
+        return postInfo(payload).asText();
     }
 
     /**
      * User vault equities.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of {@link VaultEquity}
      */
-    public JsonNode userVaultEquities(String address) {
+    public List<VaultEquity> userVaultEquities(String address) {
         Map<String, Object> payload = Map.of("type", "userVaultEquities", "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), VaultEquity.class);
     }
 
     /**
      * User's extra agents.
      *
      * @param address User address
-     * @return JSON response
+     * @return List of {@link ExtraAgent}
      */
-    public JsonNode extraAgents(String address) {
+    public List<ExtraAgent> extraAgents(String address) {
         Map<String, Object> payload = Map.of("type", "extraAgents", "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), ExtraAgent.class);
     }
 
     /**
@@ -1696,86 +1648,53 @@ public class Info {
 
     /**
      * Query user staking summary (delegatorSummary).
-     * <p>
-     * POST /info
-     * </p>
      *
      * @param address User address (42-character hexadecimal format)
-     * @return JSON response containing:
-     * <ul>
-     * <li>delegated - Delegated amount (float string)</li>
-     * <li>undelegated - Undelegated amount (float string)</li>
-     * <li>totalPendingWithdrawal - Total pending withdrawal amount (float
-     * string)</li>
-     * <li>nPendingWithdrawals - Number of pending withdrawals (int)</li>
-     * </ul>
+     * @return Typed model {@link DelegatorSummary}
      */
-    public JsonNode userStakingSummary(String address) {
+    public DelegatorSummary userStakingSummary(String address) {
         Map<String, Object> payload = Map.of(
                 "type", "delegatorSummary",
                 "user", address);
-        return postInfo(payload);
+        return JSONUtil.convertValue(postInfo(payload), DelegatorSummary.class);
     }
 
     /**
      * Query user staking delegation details (delegations).
-     * <p>
-     * POST /info
-     * </p>
      *
      * @param address User address (42-character hexadecimal format)
-     * @return JSON response array, each element contains:
-     * <ul>
-     * <li>validator - Validator address (string)</li>
-     * <li>amount - Delegated amount (float string)</li>
-     * <li>lockedUntilTimestamp - Locked until timestamp (int)</li>
-     * </ul>
+     * @return List of {@link Delegation}
      */
-    public JsonNode userStakingDelegations(String address) {
+    public List<Delegation> userStakingDelegations(String address) {
         Map<String, Object> payload = Map.of(
                 "type", "delegations",
                 "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), Delegation.class);
     }
 
     /**
      * Query user historical staking rewards (delegatorRewards).
-     * <p>
-     * POST /info
-     * </p>
      *
      * @param address User address (42-character hexadecimal format)
-     * @return JSON response array, each element contains:
-     * <ul>
-     * <li>time - Timestamp (int)</li>
-     * <li>source - Reward source (string)</li>
-     * <li>totalAmount - Total reward amount (float string)</li>
-     * </ul>
-     * @throws HypeError Thrown when the address is not a valid 42-character
-     *                   hexadecimal format
+     * @return List of {@link DelegatorReward}
      */
-    public JsonNode userStakingRewards(String address) {
+    public List<DelegatorReward> userStakingRewards(String address) {
         Map<String, Object> payload = Map.of(
                 "type", "delegatorRewards",
                 "user", address);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), DelegatorReward.class);
     }
 
     /**
      * Query delegation history (delegatorHistory).
-     * <p>
-     * POST /info
-     * </p>
      *
      * @param user User address (42-character hexadecimal format)
-     * @return JSON response containing detailed history of delegation and
-     * undelegation events, including timestamps, transaction hashes, and
-     * detailed delta information
+     * @return List of {@link DelegatorHistoryEntry}
      */
-    public JsonNode delegatorHistory(String user) {
+    public List<DelegatorHistoryEntry> delegatorHistory(String user) {
         Map<String, Object> payload = Map.of(
                 "type", "delegatorHistory",
                 "user", user);
-        return postInfo(payload);
+        return JSONUtil.toList(postInfo(payload), DelegatorHistoryEntry.class);
     }
 }

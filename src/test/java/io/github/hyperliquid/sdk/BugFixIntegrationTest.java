@@ -1,9 +1,9 @@
 package io.github.hyperliquid.sdk;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.github.hyperliquid.sdk.model.info.ClearinghouseState;
+import io.github.hyperliquid.sdk.model.info.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,27 +25,27 @@ public class BugFixIntegrationTest extends IntegrationTestBase {
 
     @Test
     void historicalOrdersReturnsNonNull() {
-        JsonNode result = client.getInfo().historicalOrders(walletAddress);
+        List<HistoricalOrder> result = client.getInfo().historicalOrders(walletAddress);
         assertNotNull(result, "historicalOrders() should return non-null");
     }
 
     @Test
     void querySpotDeployAuctionStatusReturnsNonNull() {
-        JsonNode result = client.getInfo().querySpotDeployAuctionStatus(walletAddress);
+        SpotDeployState result = client.getInfo().querySpotDeployAuctionStatus(walletAddress);
         assertNotNull(result, "querySpotDeployAuctionStatus() should return non-null");
     }
 
     @Test
     void queryUserDexAbstractionStateReturnsNonNull() {
-        JsonNode result = client.getInfo().queryUserDexAbstractionState(walletAddress);
-        assertNotNull(result, "queryUserDexAbstractionState() should return non-null");
+        boolean result = client.getInfo().queryUserDexAbstractionState(walletAddress);
+        // boolean is always non-null, just verify call succeeds
     }
 
     @Test
     void userFundingHistoryReturnsNonNull() {
         long endMs = System.currentTimeMillis();
         long startMs = endMs - 30L * 24 * 60 * 60 * 1000; // 30 days ago
-        JsonNode result = client.getInfo().userFundingHistory(walletAddress, "ETH", startMs, endMs);
+        List<UserFundingEntry> result = client.getInfo().userFundingHistory(walletAddress, "ETH", startMs, endMs);
         assertNotNull(result, "userFundingHistory() should return non-null");
     }
 }
