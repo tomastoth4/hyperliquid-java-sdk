@@ -13,13 +13,18 @@ public class HypeHttpClient {
 
     private final String baseUrl;
     private final OkHttpClient client;
-    private final RetryPolicy retryPolicy = RetryPolicy.defaultPolicy();
+    private final RetryPolicy retryPolicy;
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     public HypeHttpClient(String baseUrl, OkHttpClient client) {
+        this(baseUrl, client, RetryPolicy.defaultPolicy());
+    }
+
+    public HypeHttpClient(String baseUrl, OkHttpClient client, RetryPolicy retryPolicy) {
         this.baseUrl = baseUrl;
         this.client = client;
+        this.retryPolicy = retryPolicy;
     }
 
     /**
