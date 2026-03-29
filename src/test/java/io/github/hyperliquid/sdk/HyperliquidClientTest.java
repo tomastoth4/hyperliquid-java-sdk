@@ -1,6 +1,5 @@
 package io.github.hyperliquid.sdk;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.github.hyperliquid.sdk.apis.Info;
 import io.github.hyperliquid.sdk.model.info.*;
 import io.github.hyperliquid.sdk.utils.HypeError;
@@ -208,14 +207,8 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode node = info.metaAndAssetCtxs();
-        assertNotNull(node);
-        assertTrue(node.isObject() || node.isArray());
-        assertHttpLogsPresent();
-
-        resetLogs();
-        MetaAndAssetCtxs typed = info.metaAndAssetCtxsTyped();
-        assertNotNull(typed);
+        MetaAndAssetCtxs result = info.metaAndAssetCtxs();
+        assertNotNull(result);
         assertHttpLogsPresent();
     }
 
@@ -233,8 +226,8 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode node = info.spotMetaAndAssetCtxs();
-        assertNotNull(node);
+        SpotMetaAndAssetCtxs spotMetaAndAssetCtxs = info.spotMetaAndAssetCtxs();
+        assertNotNull(spotMetaAndAssetCtxs);
         assertHttpLogsPresent();
     }
 
@@ -261,41 +254,29 @@ public class HyperliquidClientTest extends IntegrationTestBase {
     }
 
     /**
-     * perpDexs: JSON and typed
+     * perpDexs: typed list
      */
     @Test
-    @DisplayName("Perpetual DEX list: perpDexs/perpDexsTyped")
+    @DisplayName("Perpetual DEX list: perpDexs")
     void testPerpDexs() {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode node = info.perpDexs();
-        assertNotNull(node);
-        assertTrue(node.isArray());
-        assertHttpLogsPresent();
-
-        resetLogs();
-        List<Map<String, Object>> typed = info.perpDexsTyped();
-        assertNotNull(typed);
+        List<PerpDex> dexs = info.perpDexs();
+        assertNotNull(dexs);
         assertHttpLogsPresent();
     }
 
     /**
-     * perpDexStatus: JSON and typed
+     * perpDexStatus: typed
      */
     @Test
-    @DisplayName("Perpetual DEX status: perpDexStatus/perpDexStatusTyped")
+    @DisplayName("Perpetual DEX status: perpDexStatus")
     void testPerpDexStatus() {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode node = info.perpDexStatus("");
-        assertNotNull(node);
-        assertTrue(node.isObject());
-        assertHttpLogsPresent();
-
-        resetLogs();
-        PerpDexStatus status = info.perpDexStatusTyped("");
+        PerpDexStatus status = info.perpDexStatus("");
         assertNotNull(status);
         assertHttpLogsPresent();
     }
@@ -429,19 +410,19 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         long start = end - CandleInterval.HOUR_1.toMillis() * 24;
 
         resetLogs();
-        JsonNode a1 = info.userFundingHistory(address, start, end);
+        List<UserFundingEntry> a1 = info.userFundingHistory(address, start, end);
         assertNotNull(a1);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode a2 = info.userFundingHistory(address, "BTC", start, end);
+        List<UserFundingEntry> a2 = info.userFundingHistory(address, "BTC", start, end);
         assertNotNull(a2);
         assertHttpLogsPresent();
 
         // Asset ID variant
         resetLogs();
         int btcId = info.nameToAsset("BTC");
-        JsonNode a3 = info.userFundingHistory(address, btcId, start, end);
+        List<UserFundingEntry> a3 = info.userFundingHistory(address, btcId, start, end);
         assertNotNull(a3);
         assertHttpLogsPresent();
     }
@@ -450,15 +431,15 @@ public class HyperliquidClientTest extends IntegrationTestBase {
      * User non-funding ledger updates
      */
     @Test
-    @DisplayName("Ledger: userNonFundingLedgerUpdates JSON structure")
+    @DisplayName("Ledger: userNonFundingLedgerUpdates")
     void testUserNonFundingLedgerUpdates() {
         Info info = client.getInfo();
         long end = Instant.now().toEpochMilli();
         long start = end - CandleInterval.HOUR_1.toMillis() * 24;
 
         resetLogs();
-        JsonNode node = info.userNonFundingLedgerUpdates(address, start, end);
-        assertNotNull(node);
+        List<LedgerUpdate> updates = info.userNonFundingLedgerUpdates(address, start, end);
+        assertNotNull(updates);
         assertHttpLogsPresent();
     }
 
@@ -473,12 +454,12 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         long start = end - CandleInterval.HOUR_1.toMillis() * 24;
 
         resetLogs();
-        JsonNode h = info.historicalOrders(address);
+        List<HistoricalOrder> h = info.historicalOrders(address);
         assertNotNull(h);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode twap = info.userTwapSliceFills(address);
+        List<TwapSliceFill> twap = info.userTwapSliceFills(address);
         assertNotNull(twap);
         assertHttpLogsPresent();
     }
@@ -541,11 +522,11 @@ public class HyperliquidClientTest extends IntegrationTestBase {
      * User fees (rebates/commissions)
      */
     @Test
-    @DisplayName("Fees: userFees JSON structure")
+    @DisplayName("Fees: userFees")
     void testUserFees() {
         Info info = client.getInfo();
         resetLogs();
-        JsonNode fees = info.userFees(address);
+        UserFees fees = info.userFees(address);
         assertNotNull(fees);
         assertHttpLogsPresent();
     }
@@ -587,17 +568,17 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode s = info.spotDeployState(address);
+        SpotDeployState s = info.spotDeployState(address);
         assertNotNull(s);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode p = info.portfolio(address);
+        List<PortfolioEntry> p = info.portfolio(address);
         assertNotNull(p);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode r = info.userRole(address);
+        UserRole r = info.userRole(address);
         assertNotNull(r);
         assertHttpLogsPresent();
 
@@ -616,18 +597,21 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode a = info.queryReferralState(address);
+        ReferralState a = info.queryReferralState(address);
         assertNotNull(a);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode b = info.querySubAccounts(address);
+        List<SubAccount> b = info.querySubAccounts(address);
         assertNotNull(b);
+        assertFalse(b.isEmpty(), "Should have at least one sub-account");
+        assertNotNull(b.get(0).getSubAccountUser());
+        assertNotNull(b.get(0).getMaster());
         assertHttpLogsPresent();
 
+        // API returns null when user has no multi-sig signers
         resetLogs();
-        JsonNode c = info.queryUserToMultiSigSigners(address);
-        assertNotNull(c);
+        List<String> c = info.queryUserToMultiSigSigners(address);
         assertHttpLogsPresent();
     }
 
@@ -640,18 +624,18 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode p = info.queryPerpDeployAuctionStatus();
+        DeployAuctionStatus p = info.queryPerpDeployAuctionStatus();
         assertNotNull(p);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode s = info.spotDeployState(address);
+        SpotDeployState s = info.spotDeployState(address);
         assertNotNull(s);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode d = info.queryUserDexAbstractionState(address);
-        assertNotNull(d);
+        boolean d = info.queryUserDexAbstractionState(address);
+        // boolean is always non-null, just verify call succeeds
         assertHttpLogsPresent();
     }
 
@@ -664,12 +648,12 @@ public class HyperliquidClientTest extends IntegrationTestBase {
         Info info = client.getInfo();
 
         resetLogs();
-        JsonNode e1 = info.userVaultEquities(address);
+        List<VaultEquity> e1 = info.userVaultEquities(address);
         assertNotNull(e1);
         assertHttpLogsPresent();
 
         resetLogs();
-        JsonNode e2 = info.extraAgents(address);
+        List<ExtraAgent> e2 = info.extraAgents(address);
         assertNotNull(e2);
         assertHttpLogsPresent();
     }
