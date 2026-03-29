@@ -112,4 +112,24 @@ public class WsDtoDeserializationTest {
         assertNotNull(msg.getLiquidation());
         assertEquals("0xabc", msg.getLiquidation().getUser());
     }
+
+    @Test
+    void userTwapSliceFillsMessageDeserializes() throws Exception {
+        String json = """
+            {"isSnapshot":false,"fills":[
+              {"coin":"BTC","px":"65000","sz":"0.01","side":"B","time":1700000000,
+               "startPosition":"0","dir":"Open Long","closedPnl":"0",
+               "hash":"0x0000000000000000000000000000000000000000000000000000000000000000",
+               "oid":1,"crossed":true,"fee":"0.1","tid":1,"feeToken":"USDC",
+               "twapId":"12345","builderFee":null,"cloid":null}
+            ]}
+            """;
+        UserTwapSliceFillsMessage msg =
+            JSONUtil.readValue(json, UserTwapSliceFillsMessage.class);
+        assertFalse(msg.isSnapshot());
+        assertEquals(1, msg.getFills().size());
+        assertEquals("BTC", msg.getFills().get(0).getCoin());
+        assertEquals("12345", msg.getFills().get(0).getTwapId());
+        assertNull(msg.getFills().get(0).getCloid());
+    }
 }
