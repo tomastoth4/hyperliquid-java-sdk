@@ -1439,6 +1439,14 @@ public class Info {
     }
 
     /**
+     * Typed subscribe overload for UserTwapSliceFillsSubscription.
+     */
+    public void subscribe(UserTwapSliceFillsSubscription sub, java.util.function.Consumer<UserTwapSliceFillsMessage> callback) {
+        if (skipWs) throw new HypeError("WebSocket disabled by skipWs");
+        wsManager.subscribe(sub, msg -> callback.accept(JSONUtil.convertValue(msg.get("data"), UserTwapSliceFillsMessage.class)));
+    }
+
+    /**
      * Typed subscribe overload for UserFundingsSubscription.
      */
     public void subscribe(UserFundingsSubscription sub, java.util.function.Consumer<UserFundingsMessage> callback) {

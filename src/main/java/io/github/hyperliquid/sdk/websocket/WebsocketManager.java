@@ -765,6 +765,7 @@ public class WebsocketManager {
             case "userFills":
             case "userFundings":
             case "userNonFundingLedgerUpdates":
+            case "userTwapSliceFills":
             case "webData2": {
                 JsonNode userNode = subscription.get("user");
                 String user = userNode == null ? null : userNode.asText().toLowerCase(Locale.ROOT);
@@ -864,6 +865,7 @@ public class WebsocketManager {
             case "userFills":
             case "userFundings":
             case "userNonFundingLedgerUpdates":
+            case "userTwapSliceFills":
             case "webData2": {
                 JsonNode userNode = msg.path("data").path("user");
                 String user = (userNode != null && userNode.isTextual()) ? userNode.asText().toLowerCase(Locale.ROOT)

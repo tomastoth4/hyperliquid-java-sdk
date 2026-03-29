@@ -107,3 +107,6 @@ local.properties
 
 .qoder
 .feisuan
+.factorypath
+sdk-patches-prompt.md
+docs/

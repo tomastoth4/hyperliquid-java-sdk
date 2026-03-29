@@ -12,14 +12,19 @@ public class HypeHttpClient {
     private static final Logger log = LoggerFactory.getLogger(HypeHttpClient.class);
 
     private final String baseUrl;
-
     private final OkHttpClient client;
+    private final RetryPolicy retryPolicy;
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     public HypeHttpClient(String baseUrl, OkHttpClient client) {
+        this(baseUrl, client, RetryPolicy.defaultPolicy());
+    }
+
+    public HypeHttpClient(String baseUrl, OkHttpClient client, RetryPolicy retryPolicy) {
         this.baseUrl = baseUrl;
         this.client = client;
+        this.retryPolicy = retryPolicy;
     }
 
     /**
@@ -41,37 +46,42 @@ public class HypeHttpClient {
      * @throws HypeError.ServerHypeError When response is 5xx
      */
     public JsonNode post(String path, Object payload) {
+        RateLimiter.getInstance().acquire();
         String url = baseUrl + path;
-        String requestJson = "";
         try {
-            requestJson = JSONUtil.writeValueAsString(payload);
-            log.debug("POST: {} ", url);
-            log.debug("Request: {}", requestJson);
-            RequestBody body = RequestBody.create(requestJson, JSON_MEDIA_TYPE);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .addHeader("Accept", "application/json")
-                    .post(body)
-                    .build();
+            return retryPolicy.execute(() -> {
+                String requestJson = JSONUtil.writeValueAsString(payload);
+                log.debug("POST: {} ", url);
+                log.debug("Request: {}", requestJson);
+                RequestBody body = RequestBody.create(requestJson, JSON_MEDIA_TYPE);
+                Request request = new Request.Builder()
+                        .url(url)
+                        .addHeader("Accept", "application/json")
+                        .post(body)
+                        .build();
 
-            try (Response response = client.newCall(request).execute()) {
-                ResponseBody responseBodyObj = response.body();
-                String responseBody = responseBodyObj.string();
-                log.debug("Response: {}", responseBody);
-                if (!response.isSuccessful()) {
-                    int code = response.code();
-                    String errorMsg = String.format("HTTP %d: %s", code, responseBody);
-
-                    if (code >= 400 && code < 500) {
-                        throw new HypeError.ClientHypeError(code, errorMsg);
-                    } else {
-                        throw new HypeError.ServerHypeError(code, errorMsg);
+                try (Response response = client.newCall(request).execute()) {
+                    ResponseBody responseBodyObj = response.body();
+                    String responseBody = responseBodyObj.string();
+                    log.debug("Response: {}", responseBody);
+                    if (!response.isSuccessful()) {
+                        int code = response.code();
+                        String errorMsg = String.format("HTTP %d: %s", code, responseBody);
+                        if (code >= 400 && code < 500) {
+                            throw new HypeError.ClientHypeError(code, errorMsg);
+                        } else {
+                            throw new HypeError.ServerHypeError(code, errorMsg);
+                        }
                     }
+                    return JSONUtil.readTree(responseBody);
+                } catch (IOException e) {
+                    throw new HypeError("Network error for POST " + path + ": " + e.getMessage(), e);
                 }
-                return JSONUtil.readTree(responseBody);
-            }
-        } catch (IOException e) {
-            throw new HypeError("Network error for POST " + path + ": " + e.getMessage(), e);
+            });
+        } catch (HypeError e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HypeError("Unexpected error for POST " + path + ": " + e.getMessage(), e);
         }
     }
 }

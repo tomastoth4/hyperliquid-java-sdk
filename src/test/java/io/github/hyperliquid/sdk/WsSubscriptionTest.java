@@ -20,4 +20,7 @@ public class WsSubscriptionTest {
 
     @Test void activeAssetDataType(){ assertEquals("activeAssetData", ActiveAssetDataSubscription.of("0xabc","BTC").getType()); }
     @Test void activeAssetDataId()  { assertEquals("activeAssetData:0xabc:BTC", ActiveAssetDataSubscription.of("0xabc","BTC").toIdentifier()); }
+
+    @Test void userTwapSliceFillsType() { assertEquals("userTwapSliceFills", UserTwapSliceFillsSubscription.of("0xabc").getType()); }
+    @Test void userTwapSliceFillsId()   { assertEquals("userTwapSliceFills:0xabc", UserTwapSliceFillsSubscription.of("0xabc").toIdentifier()); }
 }
